@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="es">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Registro de Gym · Carlofrancisco</title>
@@ -6,24 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0f1320;
-    --surface:#1a2035;
-    --surface-2:#232c48;
-    --line:rgba(255,255,255,.08);
-    --text:#eef1f8;
-    --muted:#8b93ad;
-    --accent:#e94560;
-    --accent-soft:rgba(233,69,96,.14);
-    --success:#27c084;
-    --success-soft:rgba(39,192,132,.14);
-    --radius:16px;
+    --bg:#0f1320;--surface:#1a2035;--surface-2:#232c48;--line:rgba(255,255,255,.08);
+    --text:#eef1f8;--muted:#8b93ad;--accent:#e94560;--accent-soft:rgba(233,69,96,.14);
+    --success:#27c084;--success-soft:rgba(39,192,132,.14);--radius:16px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;background:var(--bg);color:var(--text);
-    font-family:"Barlow",system-ui,-apple-system,sans-serif;
-    -webkit-font-smoothing:antialiased}
+    font-family:"Barlow",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
   .wrap{max-width:560px;margin:0 auto;padding:20px 16px 64px}
-
   header{margin-bottom:18px}
   .kicker{font-family:"Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;
     font-size:12px;color:var(--muted);font-weight:600}
@@ -31,8 +23,6 @@
     margin:2px 0 0;letter-spacing:.01em}
   .how{font-size:13.5px;color:var(--muted);line-height:1.5;margin-top:10px}
   .how b{color:var(--text)}
-
-  /* Day tabs */
   .tabs{display:flex;gap:8px;margin:18px 0 16px;position:sticky;top:0;
     background:var(--bg);padding:10px 0;z-index:5}
   .tab{flex:1;border:1px solid var(--line);background:var(--surface);color:var(--muted);
@@ -42,8 +32,6 @@
     text-transform:uppercase;margin-top:3px;opacity:.7}
   .tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
   .tab.active small{opacity:.85}
-
-  /* Exercise card */
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
     padding:15px 15px 13px;margin-bottom:13px;transition:border-color .2s,box-shadow .2s}
   .card.hit{border-color:var(--success);box-shadow:0 0 0 1px var(--success) inset}
@@ -53,12 +41,9 @@
     color:var(--accent);background:var(--accent-soft);padding:4px 9px;border-radius:8px;white-space:nowrap}
   .last{font-size:13px;color:var(--muted);margin-top:7px}
   .last b{color:var(--text);font-weight:600}
-
   .flag{display:none;align-items:center;gap:7px;margin-top:10px;background:var(--success-soft);
     color:var(--success);font-weight:600;font-size:13px;padding:8px 11px;border-radius:10px}
   .card.hit .flag{display:flex}
-
-  /* Input row */
   .row{display:flex;gap:8px;margin-top:12px}
   .field{flex:1;position:relative}
   .field input{width:100%;background:var(--surface-2);border:1px solid var(--line);
@@ -68,12 +53,9 @@
   .field label{position:absolute;top:-7px;left:10px;background:var(--surface);padding:0 5px;
     font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
   .save{flex-shrink:0;border:none;background:var(--accent);color:#fff;font-family:"Barlow Condensed";
-    font-weight:700;font-size:15px;letter-spacing:.04em;padding:0 18px;border-radius:11px;cursor:pointer;
-    transition:.15s}
+    font-weight:700;font-size:15px;letter-spacing:.04em;padding:0 18px;border-radius:11px;cursor:pointer;transition:.15s}
   .save:active{transform:scale(.96)}
   .save.ok{background:var(--success)}
-
-  /* History */
   .hist{margin-top:11px;display:flex;flex-direction:column;gap:0}
   .hrow{display:flex;align-items:center;justify-content:space-between;
     font-size:13px;padding:7px 2px;border-top:1px solid var(--line)}
@@ -83,14 +65,10 @@
     padding:2px 6px;line-height:1;opacity:.6}
   .hrow .del:active{opacity:1;color:var(--accent)}
   .empty{font-size:12.5px;color:var(--muted);margin-top:10px;font-style:italic}
-
   footer{margin-top:26px;text-align:center}
   .reset{background:none;border:1px solid var(--line);color:var(--muted);font-size:12px;
     padding:9px 16px;border-radius:10px;cursor:pointer;letter-spacing:.04em}
   .reset:active{border-color:var(--accent);color:var(--accent)}
-
-  .loading{text-align:center;color:var(--muted);padding:60px 0;font-size:14px}
-
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -101,18 +79,13 @@
     <p class="how">Anota <b>peso y reps de tu última serie</b> (la más difícil) en cada ejercicio.
       Cuando llegues al número de arriba del rango, la tarjeta se pone <b style="color:var(--success)">verde</b> → toca subir el peso.</p>
   </header>
-
   <div class="tabs" id="tabs"></div>
-  <div id="content"><div class="loading">Cargando tu registro…</div></div>
-
-  <footer>
-    <button class="reset" id="reset">Borrar todo el historial</button>
-  </footer>
+  <div id="content"></div>
+  <footer><button class="reset" id="reset">Borrar todo el historial</button></footer>
 </div>
 
 <script>
 const KEY = "carlo-workout-log-v1";
-
 const DAYS = [
   { id:"A", label:"Día A", sub:"Lunes", ex:[
     ["Prensa de pierna", 8,10],
@@ -140,78 +113,69 @@ const DAYS = [
   ]},
 ];
 
-let data = {};       // { A:{0:[{d,w,r}],...}, B:{}, C:{} }
+let data = {};
 let current = "A";
 
 function fmtDate(ts){
   return new Date(ts).toLocaleDateString('es-PE',{day:'numeric',month:'short'});
 }
 
-async function load(){
-  try{
-    const res = await window.storage.get(KEY);
-    data = res && res.value ? JSON.parse(res.value) : {};
-  }catch(e){
-    data = {}; // sin registro aún
-  }
-  for(const d of DAYS){ if(!data[d.id]) data[d.id] = {}; }
+function load(){
+  try{ data = JSON.parse(localStorage.getItem(KEY)) || {}; }
+  catch(e){ data = {}; }
+  for(const d of DAYS){ if(!data[d.id]) data[d.id]={}; }
   render();
 }
 
-async function persist(){
-  try{ await window.storage.set(KEY, JSON.stringify(data)); }
-  catch(e){ console.error("No se pudo guardar", e); }
+function persist(){
+  try{ localStorage.setItem(KEY, JSON.stringify(data)); }
+  catch(e){ console.error("No se pudo guardar",e); }
 }
 
-function entries(dayId, i){ return (data[dayId] && data[dayId][i]) ? data[dayId][i] : []; }
+function entries(dayId,i){ return (data[dayId]&&data[dayId][i])?data[dayId][i]:[]; }
 
 function renderTabs(){
-  const t = document.getElementById("tabs");
-  t.innerHTML = "";
+  const t=document.getElementById("tabs");
+  t.innerHTML="";
   DAYS.forEach(d=>{
-    const b = document.createElement("button");
-    b.className = "tab" + (d.id===current?" active":"");
-    b.innerHTML = `${d.label}<small>${d.sub}</small>`;
-    b.onclick = ()=>{ current=d.id; render(); };
+    const b=document.createElement("button");
+    b.className="tab"+(d.id===current?" active":"");
+    b.innerHTML=`${d.label}<small>${d.sub}</small>`;
+    b.onclick=()=>{current=d.id;render();};
     t.appendChild(b);
   });
 }
 
 function render(){
   renderTabs();
-  const day = DAYS.find(d=>d.id===current);
-  const c = document.getElementById("content");
-  c.innerHTML = "";
-
+  const day=DAYS.find(d=>d.id===current);
+  const c=document.getElementById("content");
+  c.innerHTML="";
   day.ex.forEach((ex,i)=>{
-    const [name, lo, hi] = ex;
-    const log = entries(current,i);
-    const last = log.length ? log[log.length-1] : null;
-    const hit = last && Number(last.r) >= hi;
-
-    const card = document.createElement("div");
-    card.className = "card" + (hit?" hit":"");
-
-    const lastTxt = last
-      ? `Última: <b>${last.w?last.w+" kg × ":""}${last.r} ${lo>=30?"seg":"reps"}</b> · ${fmtDate(last.d)}`
-      : `Sin registro todavía`;
-
-    let histHtml = "";
+    const [name,lo,hi]=ex;
+    const log=entries(current,i);
+    const last=log.length?log[log.length-1]:null;
+    const hit=last&&Number(last.r)>=hi;
+    const card=document.createElement("div");
+    card.className="card"+(hit?" hit":"");
+    const lastTxt=last
+      ?`Última: <b>${last.w?last.w+" kg × ":""}${last.r} ${lo>=30?"seg":"reps"}</b> · ${fmtDate(last.d)}`
+      :`Sin registro todavía`;
+    let histHtml="";
     if(log.length){
-      const recent = log.slice(-3).reverse();
-      histHtml = `<div class="hist">` + recent.map(e=>{
-        const idx = log.indexOf(e);
+      const recent=log.slice(-3).reverse();
+      histHtml=`<div class="hist">`+recent.map(e=>{
+        const idx=log.indexOf(e);
         return `<div class="hrow">
           <span class="date">${fmtDate(e.d)}</span>
           <span class="val">${e.w?e.w+" kg  ":""}${e.r} ${lo>=30?"seg":"reps"}</span>
           <button class="del" data-i="${i}" data-e="${idx}" title="Borrar">×</button>
         </div>`;
-      }).join("") + `</div>`;
+      }).join("")+`</div>`;
     } else {
-      histHtml = `<div class="empty">Registra tu primera serie para empezar a ver el progreso.</div>`;
+      histHtml=`<div class="empty">Registra tu primera serie para empezar a ver el progreso.</div>`;
     }
-
-    card.innerHTML = `
+    card.innerHTML=`
       <div class="top">
         <div class="name">${name}</div>
         <div class="range">${lo}-${hi} ${lo>=30?"seg":"reps"}</div>
@@ -229,40 +193,38 @@ function render(){
     `;
     c.appendChild(card);
   });
-
   c.querySelectorAll(".save").forEach(btn=>{
-    btn.onclick = ()=>saveEntry(Number(btn.dataset.i), btn);
+    btn.onclick=()=>saveEntry(Number(btn.dataset.i),btn);
   });
   c.querySelectorAll(".del").forEach(btn=>{
-    btn.onclick = ()=>delEntry(Number(btn.dataset.i), Number(btn.dataset.e));
+    btn.onclick=()=>delEntry(Number(btn.dataset.i),Number(btn.dataset.e));
   });
 }
 
-async function saveEntry(i, btn){
-  const w = document.getElementById("w-"+i).value.trim();
-  const r = document.getElementById("r-"+i).value.trim();
+function saveEntry(i,btn){
+  const w=document.getElementById("w-"+i).value.trim();
+  const r=document.getElementById("r-"+i).value.trim();
   if(r===""){ document.getElementById("r-"+i).focus(); return; }
-
-  if(!data[current][i]) data[current][i] = [];
-  data[current][i].push({ d: Date.now(), w: w===""?null:Number(w), r: Number(r) });
-  await persist();
-
-  btn.textContent = "✓ Listo";
+  if(!data[current][i]) data[current][i]=[];
+  data[current][i].push({d:Date.now(),w:w===""?null:Number(w),r:Number(r)});
+  persist();
+  btn.textContent="✓ Listo";
   btn.classList.add("ok");
-  setTimeout(render, 550);
+  setTimeout(render,550);
 }
 
-async function delEntry(i, idx){
+function delEntry(i,idx){
   if(!data[current][i]) return;
   data[current][i].splice(idx,1);
-  await persist();
+  persist();
   render();
 }
 
-document.getElementById("reset").onclick = async ()=>{
+document.getElementById("reset").onclick=()=>{
   if(!confirm("¿Seguro que quieres borrar TODO tu historial? Esto no se puede deshacer.")) return;
-  try{ await window.storage.delete(KEY); }catch(e){}
-  data = {}; for(const d of DAYS) data[d.id]={};
+  localStorage.removeItem(KEY);
+  data={};
+  for(const d of DAYS) data[d.id]={};
   render();
 };
 
