@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F172A">
+<title>Mi Nutrición</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
+  :root {
+    --bg: #0F172A;
+    --card: #1E293B;
+    --card-hover: #253449;
+    --border: #334155;
+    --text: #F1F5F9;
+    --text-dim: #94A3B8;
+    --text-muted: #64748B;
+    --phase1: #E67E22;
+    --phase2: #27AE60;
+    --phase3: #8E44AD;
+    --check-green: #22C55E;
+    --gym-blue: #3B82F6;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    padding: 0 0 100px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 480px; margin: 0 auto; padding: 16px; }
+
+  /* Header */
+  .header { text-align: center; padding: 12px 0 20px; }
+  .header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; }
+  .header .sub { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+
+  /* Phase bar */
+  .phase-bar { display: flex; gap: 4px; margin-bottom: 20px; }
+  .phase-seg { flex: 1; height: 6px; border-radius: 3px; background: var(--border); transition: background 0.4s; }
+  .phase-seg.active-1 { background: var(--phase1); }
+  .phase-seg.active-2 { background: var(--phase2); }
+  .phase-seg.active-3 { background: var(--phase3); }
+
+  /* Week strip */
+  .week-strip {
+    display: flex; align-items: center;
+    background: var(--card); border-radius: 16px;
+    padding: 8px 4px; margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .week-nav {
+    background: none; border: none; color: var(--text-dim);
+    font-size: 20px; padding: 4px 10px; cursor: pointer;
+  }
+  .week-days { display: flex; flex: 1; justify-content: space-around; }
+  .day-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    background: none; border: 2px solid transparent;
+    border-radius: 12px; padding: 6px 6px 5px; cursor: pointer;
+    min-width: 42px; transition: all 0.15s;
+  }
+  .day-btn.selected { border-color: var(--phase1); background: rgba(230,126,34,0.1); }
+  .day-btn .day-name { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+  .day-btn .day-num { font-size: 15px; font-weight: 600; color: var(--text); }
+  .day-btn.is-today .day-num { color: var(--phase1); }
+  .day-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: transparent;
+  }
+  .day-dot.score-100 { background: #22C55E; border-color: #22C55E; }
+  .day-dot.score-70 { background: #84CC16; border-color: #84CC16; }
+  .day-dot.score-40 { background: #EAB308; border-color: #EAB308; }
+  .day-dot.score-1 { background: #F97316; border-color: #F97316; }
+
+  /* Score header */
+  .score-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .score-row .date-info .label { font-size: 15px; font-weight: 700; }
+  .score-row .date-info .date-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .gym-badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    background: rgba(59,130,246,0.15); color: var(--gym-blue);
+    padding: 3px 10px; border-radius: 10px; margin-left: 8px;
+  }
+  .score-big { font-size: 32px; font-weight: 800; line-height: 1; }
+  .score-sub { font-size: 11px; color: var(--text-dim); text-align: right; }
+
+  /* Progress bar */
+  .progress-track {
+    height: 8px; border-radius: 4px; background: var(--border);
+    margin-bottom: 22px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Checklist */
+  .checklist { display: flex; flex-direction: column; gap: 6px; }
+  
+  .check-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 14px 14px 14px 16px;
+    cursor: pointer; transition: all 0.2s; user-select: none;
+    -webkit-user-select: none;
+  }
+  .check-item:active { transform: scale(0.98); }
+  .check-item.checked { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+
+  .checkbox {
+    width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border: 2.5px solid var(--border); transition: all 0.25s;
+    font-size: 14px; color: white;
+  }
+  .check-item.checked .checkbox {
+    background: var(--check-green); border-color: var(--check-green);
+  }
+
+  .check-content { flex: 1; min-width: 0; }
+  .check-label-row { display: flex; align-items: center; gap: 8px; }
+  .check-emoji { font-size: 16px; }
+  .check-text {
+    font-size: 14px; font-weight: 500; color: var(--text);
+    transition: all 0.2s;
+  }
+  .check-item.checked .check-text { color: var(--text-dim); text-decoration: line-through; }
+  .new-badge {
+    font-size: 9px; font-weight: 800; color: white;
+    padding: 2px 7px; border-radius: 6px;
+  }
+
+  .info-btn {
+    background: none; border: none; color: var(--text-muted);
+    font-size: 17px; padding: 4px 6px; cursor: pointer; flex-shrink: 0;
+  }
+  .tip-box {
+    margin: 5px 0 2px 50px; padding: 8px 12px;
+    background: var(--card); border-radius: 8px;
+    font-size: 12px; color: var(--text-dim); line-height: 1.5;
+    border-left: 3px solid var(--phase1);
+  }
+
+  /* Phase controls */
+  .phase-ctrl {
+    margin-top: 24px; padding: 16px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+  .phase-ctrl-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .phase-ctrl-header span { font-size: 13px; font-weight: 700; }
+  .phase-ctrl-btns { display: flex; gap: 8px; }
+  .phase-btn {
+    font-size: 12px; font-weight: 700; padding: 7px 16px;
+    border-radius: 10px; cursor: pointer; border: none;
+    transition: transform 0.1s;
+  }
+  .phase-btn:active { transform: scale(0.95); }
+  .phase-btn.advance { color: white; }
+  .phase-btn.back { background: transparent; border: 1.5px solid; }
+  .phase-ctrl p { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+
+  /* Celebration */
+  .celebration {
+    margin-top: 18px; padding: 18px; text-align: center;
+    background: linear-gradient(135deg, rgba(234,179,8,0.15), rgba(34,197,94,0.15));
+    border-radius: 16px; border: 1.5px solid rgba(163,230,53,0.3);
+  }
+  .celebration .icon { font-size: 36px; }
+  .celebration p { font-size: 14px; font-weight: 700; color: var(--check-green); margin-top: 8px; }
+
+  /* Reference */
+  .reference { margin-top: 24px; }
+  .ref-toggle {
+    font-size: 13px; font-weight: 600; color: var(--text-dim);
+    cursor: pointer; padding: 10px 0; background: none; border: none;
+    width: 100%; text-align: left;
+  }
+  .ref-content {
+    padding: 16px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 14px;
+    font-size: 13px; color: var(--text-dim); line-height: 1.8;
+    display: none;
+  }
+  .ref-content.open { display: block; margin-top: 4px; }
+  .ref-content strong { color: var(--text); display: block; margin-top: 10px; }
+  .ref-content strong:first-child { margin-top: 0; }
+  .ref-content .indent { padding-left: 10px; margin-bottom: 4px; }
+
+  /* Stats footer */
+  .stats-footer {
+    margin-top: 18px; padding: 14px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; display: flex; justify-content: space-around;
+    text-align: center;
+  }
+  .stat-val { font-size: 17px; font-weight: 800; display: block; }
+  .stat-label { font-size: 11px; color: var(--text-dim); }
+  .stat-divider { width: 1px; background: var(--border); }
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
+
+<script>
+const GYM_DAYS = [1, 4, 6];
+const DAY_NAMES = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+const MONTH_NAMES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+
+const PHASES_META = [
+  { id:1, name:"Sin starch doubling", desc:"Elige UN solo almidón por comida", color:"#E67E22" },
+  { id:2, name:"Verduras en cada plato", desc:"Medio plato de verduras en almuerzo y cena", color:"#27AE60" },
+  { id:3, name:"Cenas ligeras", desc:"Proteína + verduras, sin almidón pesado", color:"#8E44AD" },
+];
+
+const CHECKLIST = [
+  { id:"desayuno", emoji:"🍳", label:"Desayuno según fórmula", tip:"Gym: smoothie+huevos+palta · Resto: huevos+palta+fruta, sin papa", phase:1 },
+  { id:"alm_1almidon", emoji:"🍚", label:"Solo UN almidón en el almuerzo", tip:"Arroz O papa O menestra — nunca dos juntos", phase:1 },
+  { id:"alm_proteina", emoji:"🍗", label:"Proteína en el almuerzo", tip:"Pollo, pescado, atún, menestra, huevo", phase:1 },
+  { id:"snack", emoji:"🎃", label:"Snack: pepitas + fruta", tip:"Pepitas de zapallo + fruta de temporada", phase:1 },
+  { id:"cena_almidon", emoji:"🍽️", label:"Cena sin almidón doble", tip:"Máximo uno, idealmente ninguno", phase:1 },
+  { id:"agua", emoji:"💧", label:"~2.5L de agua", tip:"~7 vasos de tu botella de 350ml", phase:1 },
+  { id:"alm_verduras", emoji:"🥦", label:"Verduras en el almuerzo", tip:"Medio plato: brócoli, tomate, espinaca, zapallo...", phase:2 },
+  { id:"cena_verduras", emoji:"🥗", label:"Verduras en la cena", tip:"Ensalada, verduras salteadas, lo que sea verde", phase:2 },
+  { id:"cena_ligera", emoji:"✨", label:"Cena ligera", tip:"Solo proteína + verduras, sin arroz ni papa", phase:3 },
+];
+
+function fmtDate(d) {
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+// State
+let today = new Date();
+let selectedDate = new Date();
+let phase = parseInt(localStorage.getItem("nutri_phase") || "1");
+let openTip = null;
+let refOpen = false;
+
+function getChecks(dateStr) {
+  try { return JSON.parse(localStorage.getItem("nutri_"+dateStr)) || {}; }
+  catch { return {}; }
+}
+function saveChecks(dateStr, checks) {
+  localStorage.setItem("nutri_"+dateStr, JSON.stringify(checks));
+}
+
+function getActiveItems() {
+  return CHECKLIST.filter(i => i.phase <= phase);
+}
+
+function getScoreColor(pct) {
+  if (pct === 100) return "#22C55E";
+  if (pct >= 70) return "#84CC16";
+  if (pct >= 40) return "#EAB308";
+  if (pct > 0) return "#F97316";
+  return "";
+}
+
+function getScoreClass(pct) {
+  if (pct === 100) return "score-100";
+  if (pct >= 70) return "score-70";
+  if (pct >= 40) return "score-40";
+  if (pct > 0) return "score-1";
+  return "";
+}
+
+function getPhaseColor() { return PHASES_META[phase-1].color; }
+
+function getWeekDays() {
+  let start = new Date(selectedDate);
+  start.setDate(start.getDate() - start.getDay());
+  return Array.from({length:7}, (_,i) => {
+    let d = new Date(start);
+    d.setDate(d.getDate()+i);
+    return d;
+  });
+}
+
+function getDayScore(dateStr) {
+  let checks = getChecks(dateStr);
+  let items = getActiveItems();
+  let done = items.filter(i => checks[i.id]).length;
+  return { done, total: items.length, pct: items.length ? Math.round(done/items.length*100) : 0 };
+}
+
+function render() {
+  let dateStr = fmtDate(selectedDate);
+  let todayStr = fmtDate(today);
+  let isToday = dateStr === todayStr;
+  let isGym = GYM_DAYS.includes(selectedDate.getDay());
+  let checks = getChecks(dateStr);
+  let items = getActiveItems();
+  let checked = items.filter(i => checks[i.id]).length;
+  let total = items.length;
+  let pct = total ? Math.round(checked/total*100) : 0;
+  let weekDays = getWeekDays();
+  let phaseColor = getPhaseColor();
+
+  let html = `
+    <div class="header">
+      <h1>🔥 Mi Nutrición</h1>
+      <div class="sub">Fase ${phase}: ${PHASES_META[phase-1].name}</div>
+    </div>
+
+    <div class="phase-bar">
+      ${PHASES_META.map(p => `<div class="phase-seg ${p.id<=phase ? 'active-'+p.id : ''}"></div>`).join("")}
+    </div>
+
+    <div class="week-strip">
+      <button class="week-nav" onclick="navWeek(-1)">‹</button>
+      <div class="week-days">
+        ${weekDays.map(d => {
+          let ds = fmtDate(d);
+          let isSel = ds === dateStr;
+          let isT = ds === todayStr;
+          let sc = getDayScore(ds);
+          let dotClass = sc.pct > 0 ? getScoreClass(sc.pct) : "";
+          return `<button class="day-btn ${isSel?'selected':''} ${isT?'is-today':''}" 
+            onclick="selectDay('${ds}')"
+            ${isSel ? `style="border-color:${phaseColor};background:${phaseColor}15"` : ''}>
+            <span class="day-name">${DAY_NAMES[d.getDay()]}</span>
+            <span class="day-num">${d.getDate()}</span>
+            <div class="day-dot ${dotClass}"></div>
+          </button>`;
+        }).join("")}
+      </div>
+      <button class="week-nav" onclick="navWeek(1)">›</button>
+    </div>
+
+    <div class="score-row">
+      <div class="date-info">
+        <div class="label">
+          ${isToday ? "Hoy" : DAY_NAMES[selectedDate.getDay()]+" "+selectedDate.getDate()}
+          ${isGym ? '<span class="gym-badge">💪 Gym day</span>' : ''}
+        </div>
+        <div class="date-sub">${selectedDate.getDate()} ${MONTH_NAMES[selectedDate.getMonth()]} ${selectedDate.getFullYear()}</div>
+      </div>
+      <div>
+        <div class="score-big" style="color:${getScoreColor(pct) || 'var(--text-dim)'}">${pct}%</div>
+        <div class="score-sub">${checked}/${total} hábitos</div>
+      </div>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,${phaseColor},${getScoreColor(pct)||phaseColor})"></div>
+    </div>
+
+    <div class="checklist">
+      ${items.map(item => {
+        let isChecked = checks[item.id] || false;
+        let isNew = item.phase === phase && phase > 1;
+        return `
+          <div class="check-item ${isChecked?'checked':''}" onclick="toggleCheck('${item.id}')">
+            <div class="checkbox">${isChecked ? '✓' : ''}</div>
+            <div class="check-content">
+              <div class="check-label-row">
+                <span class="check-emoji">${item.emoji}</span>
+                <span class="check-text">${item.label}</span>
+                ${isNew ? `<span class="new-badge" style="background:${phaseColor}">NUEVO</span>` : ''}
+              </div>
+            </div>
+            <button class="info-btn" onclick="event.stopPropagation();toggleTip('${item.id}')">ⓘ</button>
+          </div>
+          ${openTip===item.id ? `<div class="tip-box" style="border-color:${phaseColor}">${item.tip}</div>` : ''}
+        `;
+      }).join("")}
+    </div>
+
+    ${pct===100 && isToday ? `
+      <div class="celebration">
+        <div class="icon">🏆</div>
+        <p>¡Día perfecto! Sigue así, crack.</p>
+      </div>
+    ` : ''}
+
+    <div class="phase-ctrl">
+      <div class="phase-ctrl-header">
+        <span>Fase ${phase} de 3</span>
+        <div class="phase-ctrl-btns">
+          ${phase>1 ? `<button class="phase-btn back" style="color:${PHASES_META[phase-2].color};border-color:${PHASES_META[phase-2].color}" onclick="changePhase(${phase-1})">← Fase ${phase-1}</button>` : ''}
+          ${phase<3 ? `<button class="phase-btn advance" style="background:${PHASES_META[phase].color}" onclick="changePhase(${phase+1})">Fase ${phase+1} →</button>` : ''}
+        </div>
+      </div>
+      <p>${phase===1 ? 'Semana 1: Enfócate solo en eliminar el starch doubling. Cuando completes 5+ días al 100%, avanza.' : phase===2 ? 'Semana 2+: Mantén la Fase 1 y ahora suma verduras en cada comida principal.' : 'Semana 3+: Todas las reglas activas. Tu cena ahora es ligera: solo proteína y verduras.'}</p>
+    </div>
+
+    <div class="reference">
+      <button class="ref-toggle" onclick="toggleRef()">📋 Referencia rápida de comidas ${refOpen?'▴':'▾'}</button>
+      <div class="ref-content ${refOpen?'open':''}">
+        <strong>🍳 Desayuno gym:</strong>
+        <div class="indent">Smoothie (banana+leche+proteína) + 2-3 huevos + ½ palta</div>
+        <strong>🍳 Desayuno normal:</strong>
+        <div class="indent">2-3 huevos + ½ palta + fruta (sin papa)</div>
+        <strong>🍚 Almuerzo:</strong>
+        <div class="indent">1 almidón + proteína + medio plato verduras</div>
+        <strong>🎃 Snack:</strong>
+        <div class="indent">Pepitas de zapallo + fruta de temporada</div>
+        <strong>🍽️ Cena:</strong>
+        <div class="indent">Proteína + verduras (sin almidón pesado)</div>
+        <div class="indent" style="font-size:12px;color:var(--text-muted)">Ej: pechuga+ensalada, atún+palta+tomate, tortilla con espinaca</div>
+      </div>
+    </div>
+
+    <div class="stats-footer">
+      <div><span class="stat-val">2,100</span><span class="stat-label">kcal/día</span></div>
+      <div class="stat-divider"></div>
+      <div><span class="stat-val">140g</span><span class="stat-label">proteína</span></div>
+      <div class="stat-divider"></div>
+      <div><span class="stat-val">73kg</span><span class="stat-label">peso actual</span></div>
+    </div>
+  `;
+  document.getElementById("app").innerHTML = html;
+}
+
+function toggleCheck(id) {
+  let dateStr = fmtDate(selectedDate);
+  let checks = getChecks(dateStr);
+  checks[id] = !checks[id];
+  saveChecks(dateStr, checks);
+  render();
+}
+
+function toggleTip(id) {
+  openTip = openTip === id ? null : id;
+  render();
+}
+
+function toggleRef() {
+  refOpen = !refOpen;
+  render();
+}
+
+function selectDay(dateStr) {
+  let [y,m,d] = dateStr.split("-").map(Number);
+  selectedDate = new Date(y, m-1, d);
+  openTip = null;
+  render();
+}
+
+function navWeek(dir) {
+  selectedDate.setDate(selectedDate.getDate() + dir*7);
+  selectedDate = new Date(selectedDate);
+  openTip = null;
+  render();
+}
+
+function changePhase(newPhase) {
+  phase = newPhase;
+  localStorage.setItem("nutri_phase", String(phase));
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
